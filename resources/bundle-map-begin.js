@@ -1,15 +1,15 @@
 {
 	// Map BGM
 	addAudio:[
-		["map-bgm",[audioserver+"tlol-village.mp3",audioserver+"tlol-village.ogg"],{channel:"bgmusic",loop:true}],	
+		["map-bgm",[audioserver+"village.mp3",audioserver+"village.ogg"],{channel:"bgmusic",loop:true}],
 	],
 	// Map graphics
-	addImage:[	
-		["tiles","resources/tlol/gfx-village.png"],
+	addImage:[
+		["tiles","resources/gfx-village.png"],
 	],
 	// Map Tileset
 	addTiles:[
-		{id:"tiles",image:"tiles",tileh:30,tilew:30,tilerow:10,gapx:0,gapy:0},	
+		{id:"tiles",image:"tiles",tileh:30,tilew:30,tilerow:10,gapx:0,gapy:0},
 	],
 	setObject:[
 		// Dialogues on this map
@@ -45,12 +45,12 @@
 		  			{ speed:1, who:"noone", audio:"beep", talk:["Klin received his first sword and","shield and is ready to put the word","end to this terrible legend." ]},
 		  		]
 		  	}
-		
+
 		// Map data and actions
 		},{
 			object:"tilemaps",
 			property:"map",
-			value:{					
+			value:{
 				title:"Kariko Village",
 				tileset:"tiles",
 				map:[
@@ -65,7 +65,7 @@
 					[   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0],
 					[   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0],
 					[   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0],
-					
+
 				  ],
 				 playerSpawnX:40,
 				 playerSpawnY:180,

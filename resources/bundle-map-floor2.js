@@ -1,15 +1,15 @@
 {
 	// Map BGM
 	addAudio:[
-		["map-bgm",[audioserver+"tlol-cave.mp3",audioserver+"tlol-cave.ogg"],{channel:"bgmusic",loop:true}],	
+		["map-bgm",[audioserver+"cave.mp3",audioserver+"cave.ogg"],{channel:"bgmusic",loop:true}],
 	],
 	// Map graphics
-	addImage:[	
-		["tiles","resources/tlol/gfx-cave.png"],
+	addImage:[
+		["tiles","resources/gfx-cave.png"],
 	],
 	// Map Tileset
 	addTiles:[
-		{id:"tiles",image:"tiles",tileh:30,tilew:30,tilerow:10,gapx:0,gapy:0},	
+		{id:"tiles",image:"tiles",tileh:30,tilew:30,tilerow:10,gapx:0,gapy:0},
 	],
 	setObject:[
 		// Dialogues on this map
@@ -43,7 +43,7 @@
 		  			{ speed:6, who:"noone", audio:"beepbad", talk:["You are the Hero of the Legend.","The Legend of Sadness."]},
 		  		]
 		  	}
-			
+
 		// Map data and actions
 		},{
 			object:"tilemaps",
@@ -116,7 +116,7 @@
 					var pl=gbox.getObject("player","player");
 					var ontile=help.getTileInMap(pl.x+pl.colx+pl.colhw,pl.y+pl.coly+pl.colhh,tilemaps.map,tilemaps._defaultblock,"map");
 					if (ontile==1) maingame.gotoLevel({level:"floor1",x:60,y:530,label:"Floor 1 stairs"});
-					
+
 				 },
 				tileIsSolid:function(obj,t){ return (obj._bullet?(t!=13)&&(t!=14):true)&&(t>9) } // Bullets flies over the pits.
 			}
