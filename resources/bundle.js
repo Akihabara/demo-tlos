@@ -49,7 +49,6 @@
 
 		["default-menu-option",[audioserver+"select.mp3",audioserver+"select.ogg"],{channel:"sfx"}],
 		["default-menu-confirm",[audioserver+"start.mp3",audioserver+"start.ogg"],{channel:"sfx"}],
-		["explosion",[audioserver+"explosion.mp3",audioserver+"explosion.ogg"],{channel:"sfx"}],
 		["coin",[audioserver+"coin.mp3",audioserver+"coin.ogg"],{channel:"sfx"}],
 		["sword",[audioserver+"sword.mp3",audioserver+"sword.ogg"],{channel:"sfx"}],
 		["beep",[audioserver+"voice_narrator.mp3",audioserver+"voice_narrator.ogg"],{channel:"sfx"}],
