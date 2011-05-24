@@ -266,8 +266,20 @@ function go() {
 
 	// Add an enemy
 	maingame.addEnemy=function(id,type,x,y,cloud) {
-		var enemy=gbox.addObject(new Enemy(id,type,x,y,cloud));
-		if (cloud) maingame.addSmoke(enemy,"flame-blue");
+		var td=gbox.getTiles(tilemaps.map.tileset);
+		var enemy;
+
+		switch (type) {
+			case "eyeswitch": { // The classic eye-shaped switch
+				enemy = gbox.addObject(new Octo(id,type,x,y,cloud));
+				break;
+			}
+			case "octo": {
+				enemy = gbox.addObject(new Eyeswitch(id,type,x,y,cloud));
+				break;
+			}
+		}
+		if (cloud) maingame.addSmoke(enemy, "flame-blue");
 		return enemy;
 	}
 	gbox.go();
