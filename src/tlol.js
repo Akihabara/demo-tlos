@@ -5,12 +5,10 @@
 
 // Game-specific
 
-var maingame;
-var tilemaps={};
-var dialogues={};
-var credits={};
-var noface; // Is a fake "actor" in dialogues. The text is ever in the same place.
 var audioserver;
+var maingame;
+var noface; // Is a fake "actor" in dialogues. The text is ever in the same place.
+var tilemaps={}, dialogues={}, credits={};
 
 // In games like Zelda, object are alive also outside of the screen.
 // So, let's calculate a distance threshold from the camera
