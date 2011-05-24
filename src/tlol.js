@@ -37,6 +37,7 @@ function go() {
 			toys.logos.rising(this,"rising",{image:"logo",x:gbox.getScreenHW()-gbox.getImage("logo").hwidth,y:20,speed:1,gapx:250,reflex:0.1,audioreach:"coin"});
 		}
 	},
+
 	// No level intro animation
 	maingame.gameIntroAnimation=function() { return true; }
 
@@ -520,405 +521,51 @@ function go() {
 	// Add a still object. Are sprites that supports the z-index (houses, trees.) You can walk around these objects
 	maingame.addBlock=function(x,y,tileset,frame) {
 		gbox.addObject({
-		group:"walls",
-		tileset:tileset,
-		zindex:0, // Needed for zindexed objects
-		x:x,
-		y:y,
-		frame:frame,
+			group:"walls",
+			tileset:tileset,
+			zindex:0, // Needed for zindexed objects
+			x:x,
+			y:y,
+			frame:frame,
 
-		initialize:function() {
-			toys.topview.initialize(this); // Any particular initialization. Just the auto z-index
-		},
+			initialize:function() {
+				toys.topview.initialize(this); // Any particular initialization. Just the auto z-index
+			},
 
-		blit:function() {
-			if (gbox.objectIsVisible(this)) {
-				// Then the object. Notes that the y is y-z to have the "over the floor" effect.
-				gbox.blitTile(gbox.getBufferContext(),{tileset:this.tileset,tile:this.frame,dx:this.x,dy:this.y+this.z,camera:this.camera,fliph:this.fliph,flipv:this.flipv});
+			blit:function() {
+				if (gbox.objectIsVisible(this)) {
+					// Then the object. Notes that the y is y-z to have the "over the floor" effect.
+					gbox.blitTile(gbox.getBufferContext(),{tileset:this.tileset,tile:this.frame,dx:this.x,dy:this.y+this.z,camera:this.camera,fliph:this.fliph,flipv:this.flipv});
+				}
 			}
-		}
-
 		});
 	}
 
 	// Add a npc (Not Playing Charachter)
 	maingame.addNpc=function(x,y,still,dialogue,questid,talking,silence) {
 		// An easy way to create an NPC.
-		gbox.addObject({
-		questid:questid,
-		group:"walls",
-		tileset:"npc",
-		zindex:0, // Needed for zindexed objects
-		x:x,
-		y:y,
-		myDialogue:dialogue,
-		iamTalking:false,
-		silence:silence,
-		shadow:{tileset:"shadows",tile:0},
-		frames:{
-			still:{ speed:6, frames:still },
-			talking:{ speed:6, frames:(talking==null?still:talking) }
-		},
-
-		doPlayerAction:function(sw) {
-			if (this.silence) toys.generate.audio.fadeOut(this,"background",null,{channel:"bgmusic"});
-			this.iamTalking=true; // go in talking mode
-			maingame.startDialogue(this.myDialogue); // Starts its dialogue. Is another object because of z-index
-		},
-
-		initialize:function() {
-			toys.topview.initialize(this); // Any particular initialization. Just the auto z-index
-		},
-
-		first:function(by) {
-			this.counter=(this.counter+1)%12;
-
-			if (this.iamTalking) {
-				this.frame=help.decideFrame(this.counter,this.frames.talking);
-				if (!gbox.getObject("foreground","dialogue")) {// Check if the dialogue ended
-					this.iamTalking=false; // Stop talking
-					if ((this.questid!=null)&&(!tilemaps.queststatus[this.questid])) {
-						tilemaps.queststatus[this.questid]=true; // If related to a quest, the quest is marked as done
-						maingame.addQuestClear();
-					}
-				}
-			} else
-				this.frame=help.decideFrame(this.counter,this.frames.still);
-			},
-
-			blit:function() {
-				if (gbox.objectIsVisible(this)) {
-					// Shadowed object. First draws the shadow...
-					gbox.blitTile(gbox.getBufferContext(),{tileset:this.shadow.tileset,tile:this.shadow.tile,dx:this.x,dy:this.y+this.h-gbox.getTiles(this.shadow.tileset).tileh+4,camera:this.camera});
-					// Then the object. Notes that the y is y-z to have the "over the floor" effect.
-					gbox.blitTile(gbox.getBufferContext(),{tileset:this.tileset,tile:this.frame,dx:this.x,dy:this.y+this.z,camera:this.camera,fliph:this.fliph,flipv:this.flipv});
-				 }
-			 }
-		});
+		gbox.addObject(new Npc(x,y,still,dialogue,questid,talking,silence));
 	}
 
 	// Add an enemy
 	maingame.addEnemy=function(id,type,x,y,cloud) {
-		var td=gbox.getTiles(tilemaps.map.tileset);
-
-		var ob;
-		switch (type) {
-			case "eyeswitch": { // The classic eye-shaped switch
-				ob=gbox.addObject({
-					questid:id,
-					group:"foes",
-					tileset:"npc",
-					zindex:0, // Needed for zindexed objects
-					x:x*td.tilew,
-					y:y*td.tileh,
-					switchedon:false,
-					frame:0,
-					changeSwitch:function(sw) {
-						this.switchedon=(sw?true:false); // The switch is on
-						this.frame=(sw?1:0); // Change image
-						if (this.questid!=null) tilemaps.queststatus[this.questid]=(sw?true:false); // Mark the quest as done
-					},
-
-					initialize:function() {
-						toys.topview.initialize(this); // Any particular initialization. Just the auto z-index
-					},
-
-					hitByBullet:function(by) {
-						if (by._canhitswitch&&!this.switchedon) { // if is hit by bullet
-							gbox.hitAudio("default-menu-option");
-							this.changeSwitch(true);
-							maingame.addQuestClear(); // Say "quest clear"
-						}
-					},
-
-					blit:function() {
-						if (gbox.objectIsVisible(this)) {
-							// Then the object. Notes that the y is y-z to have the "over the floor" effect.
-							gbox.blitTile(gbox.getBufferContext(),{tileset:this.tileset,tile:this.frame,dx:this.x,dy:this.y+this.z,camera:this.camera,fliph:this.fliph,flipv:this.flipv});
-						}
-					}
-				});
-				break;
-			}
-			case "octo": {
-				ob=gbox.addObject({
-					id:id,
-					group:"foes",
-					tileset:"foe1",
-					zindex:0, // Needed for zindexed objects
-					invultimer:0, // Custom attribute. A timer that keep invulnerable.
-					stilltimer:0, // Custom attribute. A timer that keep the enemy still.
-					x:x*td.tilew,
-					y:y*td.tileh,
-
-					initialize:function() {
-						toys.topview.initialize(this,{
-							health:3, // Custom attribute. Indicates the strength.
-							shadow:{tileset:"shadows",tile:0},
-							frames:{
-								standup:{ speed:1, frames:[1] },
-								standdown:{ speed:1, frames:[3] },
-								standleft:{ speed:1, frames:[4] },
-								standright:{ speed:1, frames:[4] },
-								movingup:{speed:3,frames:[0,1] },
-								movingdown:{speed:3,frames:[2,3] },
-								movingleft:{speed:3,frames:[4,5] },
-								movingright:{speed:3,frames:[4,5] }
-							}
-						});
-					},
-					kill:function(by){
-						gbox.hitAudio("hurt");
-						toys.generate.sparks.simple(this,"sparks",null,{animspeed:2,accy:-3,tileset:"flame-blue"});
-						toys.generate.sparks.simple(this,"sparks",null,{animspeed:1,accx:-3,tileset:"flame-blue"});
-						toys.generate.sparks.simple(this,"sparks",null,{animspeed:1,accx:3,tileset:"flame-blue"});
-						if (help.random(0,2)==0) maingame.addBonus(this.x,this.y,"coin"); // reward with a coin, sometime
-						gbox.trashObject(this); // Vanish!
-					},
-
-					attack:function() {
-					if (gbox.objectIsVisible(this)) gbox.hitAudio("hit"); // Only visible enemies plays audio: audio heard without seeying anything is confusing.
-						this.stilltimer=10; // Stay still for a while
-						this.frame=(this.facing==toys.FACE_UP?0:(this.facing==toys.FACE_DOWN?3:4));
-						toys.generate.sparks.simple(this,"sparks",null,{animspeed:2,accy:-2,tileset:"flame-white"});
-						toys.topview.fireBullet("foesbullets",null,{
-							fullhit:true,
-							collidegroup:"player",
-							map:tilemaps.map, // Map is specified, since collides with walls
-							mapindex:"map",
-							defaulttile:tilemaps._defaultblock,
-							undestructable:false, // Custom attribute. Is destroyed by the hitted object.
-							power:1, // Custom attribute. Is the damage value of this weapon.
-							from:this,
-							sidex:this.facing,
-							sidey:this.facing,
-							tileset:"bullet-black",
-							frames:{speed:1,frames:[0]},
-							acc:5,
-							fliph:(this.facing==toys.FACE_RIGHT),
-							flipv:(this.facing==toys.FACE_DOWN),
-							angle:toys.FACES_ANGLE[this.facing],
-							spritewalls:"walls",
-							gapy:7 // Avoid wall collision on start
-						});
-					},
-
-					hitByBullet:function(by) {
-						if (!this.invultimer) { // If is not invulnerable
-							this.health-=by.power; // Decrease power
-							if (this.health<=0) // If dead..
-								 this.kill(); // Kill...
-							else { // Else is just hit
-								this.accz=-5; // A little jump...
-								this.invultimer=10; // Stay invulnerable for a while...
-								this.stilltimer=10; // Stay still for a while...
-							 }
-							return by.undestructable; // Destroy or not a bullet (decided by the bullet itself)
-						}
-					},
-
-					first:function() {
-						if (this.stilltimer) this.stilltimer--;
-						if (this.invultimer) this.invultimer--;
-
-						if (objectIsAlive(this)) {
-							// Counter
-							this.counter=(this.counter+1)%60;
-							if (!this.killed) {
-								if (!this.stilltimer) toys.topview.wander(this,tilemaps.map,"map",100,{speed:1,minstep:20,steprange:150}); // tile collisions
-								if ((!this.stilltimer)&&toys.timer.randomly(this,"fire",{base:50,range:50})) this.attack(); // Fires randomly
-								toys.topview.handleAccellerations(this);
-								toys.topview.handleGravity(this); // z-gravity
-								if (!this.stilltimer) toys.topview.applyForces(this); // Apply forces
-								toys.topview.applyGravity(this); // z-gravity
-								toys.topview.tileCollision(this,tilemaps.map,"map",100); // tile collisions
-								toys.topview.spritewallCollision(this,{group:"walls"}); // walls collisions
-								toys.topview.floorCollision(this); // Collision with the floor (for z-gravity)
-								toys.topview.adjustZindex(this); // Set the right zindex
-								if (!this.stilltimer) toys.topview.setFrame(this); // set the right animation frame (if not attacking - which has still frame)
-								var pl=gbox.getObject("player","player");
-								if (!pl.initialize&&pl.collisionEnabled()&&(toys.topview.collides(this,pl))) pl.hitByBullet({power:1}); // If colliding with the player, hit with power 1
-							}
-						}
-					},
-					blit:function() {
-						if ((!this.killed)&&gbox.objectIsVisible(this)&&((this.invultimer%2)==0)) {
-							// Shadowed object. First draws the shadow...
-							gbox.blitTile(gbox.getBufferContext(),{tileset:this.shadow.tileset,tile:this.shadow.tile,dx:this.x,dy:this.y+this.h-gbox.getTiles(this.shadow.tileset).tileh+4,camera:this.camera});
-
-							// Then the object. Notes that the y is y-z to have the "over the floor" effect.
-							gbox.blitTile(gbox.getBufferContext(),{tileset:this.tileset,tile:this.frame,dx:this.x,dy:this.y+this.z,camera:this.camera,fliph:this.fliph,flipv:this.flipv});
-						 }
-					}
-				});
-			break;
-			}
-		}
-		if (cloud) maingame.addSmoke(ob,"flame-blue");
-		return ob;
+		var enemy=gbox.addObject(new Enemy(id,type,x,y,cloud));
+		if (cloud) maingame.addSmoke(enemy,"flame-blue");
+		return enemy;
 	}
 	gbox.go();
 }
 
 // BOOTSTRAP
 gbox.onLoad(function () {
-	/*
-	   tool.makecels({
-	   rows:[
-	   [
-	   {img:"_bin/klin_up.png"},
-	   {img:"_bin/klin_up_2.png"},
-	   {img:"_bin/klin_up_3.png"},
-	   {img:"_bin/klin_down.png"},
-	   {img:"_bin/klin_down_2.png"},
-	   {img:"_bin/klin_down_3.png"},
-	   {img:"_bin/klin_stand_side.png"},
-	   {img:"_bin/klin_side_1.png"},
-	   {img:"_bin/klin_die.png"},
-	   {img:"_bin/klin_up_attack.png"},
-	   {img:"_bin/klin_down_attack.png"},
-	   {img:"_bin/klin_side_attack.png"}
-	   ],
-	   [
-	   {img:"_bin/tile-grass.png"},
-	   {img:"_bin/tile-dungefloor.png"},
-	   {img:"_bin/tile-entrance.png"},
-	   {img:"_bin/tile-entrance-2.png"},
-	   {img:"_bin/tile-dungefloor2"},
-	   {img:"_bin/tile-dungestairdown.png"},
-	   {img:"_bin/tile-dungestairup.png"},
-	   {img:"_bin/tile-buttondown.png"},
-	   {img:"_bin/tile-buttonup.png"},
-	   {img:"_bin/tile-dungefloor3.png"},
-	   ],
-	   [
-	   {img:"_bin/tile-rock.png"},
-	   {img:"_bin/tile-cesp.png"},
-	   {img:"_bin/tile-grassrock.png"},
-	   {img:"_bin/tile-mountain.png"},
-	   {img:"_bin/tile-dungewall2"},
-	   {img:"_bin/tile-dungewall3"},
-	   {img:"_bin/tile-dungewall4"},
-	   {img:"_bin/tile-dungepit1"},
-	   {img:"_bin/tile-dungepit2"},
-	   ],
-	   [
-	   {img:"_bin/hit 1.png"},
-	   {img:"_bin/hit 2.png"},
-	   {img:"_bin/hit 3.png"},
-	   {img:"_bin/hit 4.png"},
-	   ],
-	   [
-	   {img:"_bin/right/up/hit 1.png"},
-	   {img:"_bin/right/up/hit 2.png"},
-	   {img:"_bin/right/up/hit 3.png"},
-	   {img:"_bin/right/up/hit 4.png"}
+	help.akihabaraInit({title:"The Legend Of Sadness",splash:{footnotes:["Musics by: Greenleo, Graulund, Robert Jaret.","Full credits on ending title."]}});
 
-	   ],
-	   [
-	   {img:"_bin/foes_1_up.png"},
-	   {img:"_bin/foes_1_up_2.png"},
-	   {img:"_bin/foes_1_down.png"},
-	   {img:"_bin/foes_1_down_2.png"},
-	   {img:"_bin/foes_1_left.png"},
-	   {img:"_bin/foes_1_left_2.png"}
+	// We are not going to use faces for dialogues
+	noface={ noone:{ x:10, y:170,box:{x:0,y:160,w:gbox.getScreenW(),h:60,alpha:0.5} } };
 
-	   ],
-	   [
-	   {img:"_bin/shadow-small.png"},
-	   ],
-	   [
-	   {img:"_bin/coin 1.png"},
-	   {img:"_bin/coin 2.png"},
-	   {img:"_bin/coin 4.png"},
-	   {img:"_bin/coin 6.png"},
-	   {img:"_bin/coin 5.png"},
-	{img:"_bin/coin 3.png"},
-	{img:"_bin/bonus-arrow.png"},
-	{img:"_bin/bonus-arrow.png",filter:{color:{r:255,g:255,b:255,a:255}}},
-	{img:"_bin/smallkey"},
-	{img:"_bin/smallkey",filter:{color:{r:255,g:255,b:255,a:255}}},
-	{img:"_bin/bosskey.png"},
-	{img:"_bin/bosskey.png",filter:{color:{r:255,g:255,b:255,a:255}}},
-	{img:"_bin/heart1.png"},
-	{img:"_bin/heart2.png"},
-	{img:"_bin/heart3.png"},
-	{img:"_bin/heart4.png"},
-	{img:"_bin/heart5.png"},
-	{img:"_bin/hud-bosskey.png"},
-	{img:"_bin/hud-smallkey.png"},
-	{img:"_bin/hud-coin.png"},
+	audioserver="resources/audio/"
 
-	],
-	[
-	{img:"_bin/smoke 1.png"},
-	{img:"_bin/smoke 2.png"},
-	{img:"_bin/smoke 3.png"},
-	{img:"_bin/smoke 4.png"},
+	gbox.addBundle({file:"resources/bundle.js"}); // Audio, sprites, fonts etc. are loaded here now. Cleaner code! Btw you can still load resources from the code, like in Capman.
 
-	{img:"_bin/smoke 1.png",filter:{replace:[{from:{r:255,g:255,b:255,a:255},to:{r:130,g:2,b:252,a:255}},{from:{r:76,g:76,b:76,a:255},to:{r:0,g:0,b:0,a:255}}]}},
-	{img:"_bin/smoke 2.png",filter:{replace:[{from:{r:255,g:255,b:255,a:255},to:{r:130,g:2,b:252,a:255}},{from:{r:76,g:76,b:76,a:255},to:{r:0,g:0,b:0,a:255}}]}},
-	{img:"_bin/smoke 3.png",filter:{replace:[{from:{r:255,g:255,b:255,a:255},to:{r:85,g:0,b:145,a:255}},{from:{r:76,g:76,b:76,a:255},to:{r:0,g:0,b:0,a:255}}]}},
-	{img:"_bin/smoke 4.png",filter:{replace:[{from:{r:255,g:255,b:255,a:255},to:{r:25,g:25,b:25,a:255}},{from:{r:76,g:76,b:76,a:255},to:{r:0,g:0,b:0,a:255}}]}},
-
-	{img:"_bin/smoke 1.png",filter:{replace:[{from:{r:255,g:255,b:255,a:255},to:{r:249,g:37,b:37,a:255}},{from:{r:76,g:76,b:76,a:255},to:{r:144,g:1,b:9,a:255}}]}},
-	{img:"_bin/smoke 2.png",filter:{replace:[{from:{r:255,g:255,b:255,a:255},to:{r:251,g:147,b:31,a:255}},{from:{r:76,g:76,b:76,a:255},to:{r:144,g:1,b:9,a:255}}]}},
-	{img:"_bin/smoke 3.png",filter:{replace:[{from:{r:255,g:255,b:255,a:255},to:{r:144,g:82,b:13,a:255}},{from:{r:76,g:76,b:76,a:255},to:{r:25,g:25,b:25,a:255}}]}},
-	{img:"_bin/smoke 4.png",filter:{replace:[{from:{r:255,g:255,b:255,a:255},to:{r:25,g:25,b:25,a:255}},{from:{r:0,g:0,b:0,a:255},to:{r:0,g:0,b:0,a:255}}]}},
-
-	],
-	[
-	{img:"_bin/bulletblack-1.png"}
-	],
-		[
-		{img:"_bin/door.png"},
-		{img:"_bin/door-v.png"},
-		],
-		[
-		{img:"_bin/tile-chest.png"},
-		],
-		[
-		{img:"_bin/arrow-left1.png"},
-		{img:"_bin/arrow-left2.png"},
-		],
-		[
-		{img:"_bin/arrow-up1.png"},
-		{img:"_bin/arrow-up2.png"},
-		],
-		[
-		{img:"_bin/item-sword.png"},
-		{img:"_bin/item-arrow.png"},
-		],
-		[
-		{img:"_bin/tile-dungeye"},
-		{img:"_bin/tile-dungeye2"},
-		{img:"_bin/oldman 1.png"},
-		{img:"_bin/oldman 2.png"},
-		{img:"_bin/villager 1.png"},
-		{img:"_bin/villager 2.png"},
-		{img:"_bin/wife 1.png"},
-		{img:"_bin/wife 2.png"},
-		{img:"_bin/spirit 1.png"},
-		{img:"_bin/spirit 2.png"},
-		],
-		[
-		{img:"_bin/house.png"},
-		]
-			]
-});
-return;
-*/
-
-
-help.akihabaraInit({title:"The Legend Of Sadness",splash:{footnotes:["Musics by: Greenleo, Graulund, Robert Jaret.","Full credits on ending title."]}});
-
-// We are not going to use faces for dialogues
-noface={ noone:{ x:10, y:170,box:{x:0,y:160,w:gbox.getScreenW(),h:60,alpha:0.5} } };
-
-audioserver="resources/audio/"
-
-gbox.addBundle({file:"resources/bundle.js"}); // Audio, sprites, fonts etc. are loaded here now. Cleaner code! Btw you can still load resources from the code, like in Capman.
-
-gbox.loadAll(go);
+	gbox.loadAll(go);
 }, false);
-
