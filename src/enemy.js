@@ -141,6 +141,7 @@ var Enemy = function(id,type,x,y,cloud){
 						}
 					}
 				},
+
 				blit:function() {
 					if ((!this.killed)&&gbox.objectIsVisible(this)&&((this.invultimer%2)==0)) {
 						// Shadowed object. First draws the shadow...

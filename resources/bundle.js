@@ -9,7 +9,7 @@
 	addFont:[
 		{id:"small",image:"font",firstletter:" ",tileh:8,tilew:8,tilerow:255,gapx:0,gapy:0},
 		{id:"smalltut",image:"font",firstletter:" ",tileh:8,tilew:8,tilerow:255,gapx:0,gapy:24},
-		{id:"big",image:"fontbig",firstletter:" ",tileh:16,tilew:8,tilerow:255,gapx:0,gapy:0},
+		{id:"big",image:"fontbig",firstletter:" ",tileh:16,tilew:8,tilerow:255,gapx:0,gapy:0}
 	],
 	addTiles:[
 		{id:"player",image:"sprites",tileh:30,tilew:30,tilerow:12,gapx:0,gapy:0},

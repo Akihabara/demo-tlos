@@ -1,15 +1,15 @@
 {
 	// Map BGM
 	addAudio:[
-		["map-bgm",[audioserver+"cave.mp3",audioserver+"cave.ogg"],{channel:"bgmusic",loop:true}],
+		["map-bgm",[audioserver+"cave.mp3",audioserver+"cave.ogg"],{channel:"bgmusic",loop:true}]
 	],
 	// Map graphics
 	addImage:[
-		["tiles","resources/gfx-cave.png"],
+		["tiles","resources/gfx-cave.png"]
 	],
 	// Map Tileset
 	addTiles:[
-		{id:"tiles",image:"tiles",tileh:30,tilew:30,tilerow:10,gapx:0,gapy:0},
+		{id:"tiles",image:"tiles",tileh:30,tilew:30,tilerow:10,gapx:0,gapy:0}
 	],
 	setObject:[
 		// Dialogues on this map
@@ -40,7 +40,7 @@
 		  			{ speed:1, who:"noone", audio:"beepbad", talk:["Your eyes... I know you, my little","guy..."]},
 		  			{ speed:1, who:"noone", audio:"beepbad", talk:["I'm the guardian of all the souls","who died here, tricked by the evil","villagers of the Kariko village."]},
 		  			{ speed:1, who:"noone", audio:"beepbad", talk:["I'll teach everything I know. A","day you'll be able to go out","and bring the rage of the tricked."]},
-		  			{ speed:6, who:"noone", audio:"beepbad", talk:["You are the Hero of the Legend.","The Legend of Sadness."]},
+		  			{ speed:6, who:"noone", audio:"beepbad", talk:["You are the Hero of the Legend.","The Legend of Sadness."]}
 		  		]
 		  	}
 
@@ -64,8 +64,9 @@
 					[  12,   6,   1,   6,   6,   6,   6,   6,   6,   6,  12,  12,   0,   0,  14,  14,  14,  14,   6,   6,  14,   0,   0,  12],
 					[  12,   6,   6,   6,   6,   6,   6,   6,   6,   6,  12,  12,   0,   0,  14,  14,  14,  14,  13,  13,  14,   0,   0,  12],
 					[  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12,  12]
-				  ],
-				 addObjects:function() {
+				],
+
+				addObjects:function() {
 					if (!tilemaps.queststatus["oldmanstory"]) gbox.playAudio("map-bgm");
 					if (tilemaps.queststatus["oldmanstory"]) // If you've heard the old man story...
 						maingame.addNpc(555,180,[8,9],"soul"); // The soul of the tricked appears.
@@ -82,11 +83,12 @@
 						maingame.addEnemy("fifth4","octo",7,4,true);
 						tilemaps.queststatus["_tmpbosskey"]=false;
 					}
-				 },
-				 mapActions:function() {
+				},
+
+				mapActions:function() {
 					var pl=gbox.getObject("player","player");
 					var ontile=help.getTileInMap(pl.x+pl.colx+pl.colhw,pl.y+pl.coly+pl.colhh,tilemaps.map,tilemaps._defaultblock,"map");
-					if (!tilemaps.queststatus["floor2trapped"]&&!tilemaps.queststatus["floor2untrapped"]) // the trap on floor 2
+					if (!tilemaps.queststatus["floor2trapped"]&&!tilemaps.queststatus["floor2untrapped"]){ // the trap on floor 2
 						if (ontile==4) {
 							gbox.hitAudio("beep"); // Switch sound
 							maingame.addDoor("sidedoor","doorv",10,4,true);
@@ -98,7 +100,8 @@
 							maingame.addQuestClear("TRAPPED!");
 							maingame.startDialogue("usebtutorial"); // Explain how to open the first tresaure chest.
 							maingame.setTileInMap(14,6,3,true);
-						 }
+						}
+					}
 					if (tilemaps.queststatus["floor2trapped"]&&!tilemaps.queststatus["floor2untrapped"]) {
 						if (!gbox.getObject("foes","third1")&&!gbox.getObject("foes","third2")&&!gbox.getObject("foes","third3")&&!gbox.getObject("foes","third4")) { // check them. If beaten...
 							gbox.getObject("walls","sidedoor").doOpen();
@@ -116,8 +119,8 @@
 					var pl=gbox.getObject("player","player");
 					var ontile=help.getTileInMap(pl.x+pl.colx+pl.colhw,pl.y+pl.coly+pl.colhh,tilemaps.map,tilemaps._defaultblock,"map");
 					if (ontile==1) maingame.gotoLevel({level:"floor1",x:60,y:530,label:"Floor 1 stairs"});
+				},
 
-				 },
 				tileIsSolid:function(obj,t){ return (obj._bullet?(t!=13)&&(t!=14):true)&&(t>9) } // Bullets flies over the pits.
 			}
 		}

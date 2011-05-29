@@ -1,15 +1,15 @@
 {
 	// Map BGM
 	addAudio:[
-		["map-bgm",[audioserver+"cave.mp3",audioserver+"cave.ogg"],{channel:"bgmusic",loop:true}],
+		["map-bgm",[audioserver+"cave.mp3",audioserver+"cave.ogg"],{channel:"bgmusic",loop:true}]
 	],
 	// Map graphics
 	addImage:[
-		["tiles","resources/gfx-cave.png"],
+		["tiles","resources/gfx-cave.png"]
 	],
 	// Map Tileset
 	addTiles:[
-		{id:"tiles",image:"tiles",tileh:30,tilew:30,tilerow:10,gapx:0,gapy:0},
+		{id:"tiles",image:"tiles",tileh:30,tilew:30,tilerow:10,gapx:0,gapy:0}
 	],
 	setObject:[
 		// Dialogues on this map
@@ -30,7 +30,7 @@
 					{ speed:1, who:"noone", audio:"beep", talk:["Oh no... no...","Not again!"]},
 					{ speed:1, who:"noone", audio:"beep", talk:["They tricked you too!","There isn't any monster here...","70 years ago the villagers sent me","here saying that I was the hero","of the legend..."]},
 					{ speed:1, who:"noone", audio:"beep", talk:["But all I've found here was a bunch","of bones...","I'm sure that was who was sent here","before me!"]},
-					{ speed:1, who:"noone", audio:"beep", talk:["So now... is your turn! You'll get","old here all alone and die!","I'm really sorry but is true.","There isn't any way to go out...","Poor guy!"]},
+					{ speed:1, who:"noone", audio:"beep", talk:["So now... is your turn! You'll get","old here all alone and die!","I'm really sorry but is true.","There isn't any way to go out...","Poor guy!"]}
 				]
 			}
 
@@ -131,6 +131,7 @@
 					if (ontile==2) maingame.gotoLevel({level:"floor2",x:90,y:240,label:"Floor 2 entrance"});
 					if (ontile==5) maingame.gotoLevel({level:"begin",x:330,y:90,label:"Kariko village's cave"});
 				 },
+
 				tileIsSolid:function(obj,t){ return (obj._bullet?(t!=13)&&(t!=14):true)&&(t>9) } // Bullets flies over the pits.
 			}
 		}
